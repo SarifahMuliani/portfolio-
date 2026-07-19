@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sarifah Muliani — AI & Data Analyst</title>
+<meta name="description" content="Informatics Engineering graduate from UIN SUSKA Riau, now working as an AI & Data Analyst — building chatbots, annotating datasets, and training computer vision models for real-world problems in agriculture and healthcare.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#132419;
+  --canvas-dark:#122318;
+  --canvas-dark-2:#1B3324;
+  --canvas-light:#F3EFE1;
+  --canvas-card:#FBF9F1;
+  --amber:#D9A441;
+  --amber-dim:#B98A34;
+  --sage:#7FA688;
+  --line-dark:rgba(243,239,225,0.18);
+  --line-light:rgba(19,36,25,0.14);
+  --font-display:'Fraunces', serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --font-body:'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--canvas-light);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+img{max-width:100%;display:block;}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px;}
+
+/* ---------- annotation tag primitive ---------- */
+.tag{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:0.02em;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border:1px solid currentColor;
+  border-radius:2px;
+  color:var(--amber);
+  text-transform:lowercase;
+}
+.tag .dot{width:5px;height:5px;background:currentColor;border-radius:50%;display:inline-block;}
+.chip{
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  padding:5px 11px;
+  border:1px solid var(--line-light);
+  border-radius:3px;
+  color:var(--ink);
+  background:var(--canvas-card);
+  display:inline-block;
+  white-space:nowrap;
+}
+
+/* ---------- bbox frame: the signature element ---------- */
+.bbox{
+  position:relative;
+  border:1px dashed var(--line-light);
+  padding:clamp(20px,4vw,48px);
+}
+.bbox::before,.bbox::after,
+.bbox .corner-tl,.bbox .corner-br{
+  content:"";
+  position:absolute;
+  width:16px;height:16px;
+  border-color:var(--amber);
+  border-style:solid;
+  transition:transform .35s ease;
+}
+.bbox::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.bbox::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.bbox .corner-tl{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.bbox .corner-br{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+.bbox:hover::before{transform:translate(-3px,-3px);}
+.bbox:hover::after{transform:translate(3px,3px);}
+.bbox:hover .corner-tl{transform:translate(3px,-3px);}
+.bbox:hover .corner-br{transform:translate(-3px,3px);}
+.bbox-label{
+  position:absolute;
+  top:-11px;left:16px;
+  background:var(--canvas-light);
+  padding:0 8px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--amber-dim);
+  text-transform:lowercase;
+}
+.bbox-label.on-dark{background:var(--canvas-dark);color:var(--amber);}
+.bbox-label.on-card{background:var(--canvas-card);}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    linear-gradient(180deg, var(--canvas-dark) 0%, var(--canvas-dark-2) 100%);
+  color:var(--canvas-light);
+  position:relative;
+  overflow:hidden;
+  padding:96px 0 88px;
+}
+.hero::before{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--line-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+  background-size:48px 48px;
+  opacity:0.35;
+  mask-image:radial-gradient(ellipse at center, black 0%, transparent 75%);
+}
+.hero-inner{position:relative;z-index:1;}
+.eyebrow-row{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin-bottom:28px;
+}
+.hero-frame{position:relative;padding:36px clamp(20px,5vw,56px) 40px;border:1px dashed var(--line-dark);}
+.hero-frame::before,.hero-frame::after,.hero-frame .corner-tl,.hero-frame .corner-br{
+  content:"";position:absolute;width:20px;height:20px;border-color:var(--amber);border-style:solid;
+}
+.hero-frame::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.hero-frame::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.hero-frame .corner-tl{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.hero-frame .corner-br{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+h1.name{
+  font-family:var(--font-display);
+  font-optical-sizing:auto;
+  font-weight:600;
+  font-size:clamp(40px,7vw,76px);
+  line-height:0.98;
+  margin:0 0 14px;
+  letter-spacing:-0.01em;
+}
+.role-line{
+  font-family:var(--font-mono);
+  font-size:clamp(13px,1.6vw,16px);
+  color:var(--amber);
+  margin-bottom:18px;
+}
+.role-line span.conf{color:var(--sage);}
+.tagline{
+  max-width:560px;
+  font-size:17px;
+  color:rgba(243,239,225,0.82);
+  margin:0 0 26px;
+}
+.meta-row{
+  display:flex;flex-wrap:wrap;gap:8px 10px;
+  font-family:var(--font-mono);font-size:12.5px;
+  color:rgba(243,239,225,0.65);
+}
+.meta-row a{text-decoration:none;border-bottom:1px solid transparent;}
+.meta-row a:hover{border-color:var(--amber);color:var(--amber);}
+.metric-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:1px;margin-top:44px;
+  background:var(--line-dark);
+  border:1px solid var(--line-dark);
+}
+.metric-strip .m{
+  background:var(--canvas-dark);
+  padding:16px 18px;
+}
+.metric-strip .m .v{
+  font-family:var(--font-display);font-weight:600;font-size:26px;color:var(--canvas-light);
+}
+.metric-strip .m .k{
+  font-family:var(--font-mono);font-size:10.5px;color:var(--amber-dim);text-transform:lowercase;margin-top:2px;
+}
+
+/* ---------- section scaffolding ---------- */
+section{padding:76px 0;}
+.section-head{margin-bottom:38px;position:relative;padding-left:18px;border-left:2px solid var(--amber);}
+.section-head .tag{margin-bottom:10px;}
+.section-head h2{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,36px);
+  margin:0;letter-spacing:-0.01em;
+}
+.section-head .kicker{
+  font-size:14.5px;color:rgba(19,36,25,0.62);margin:8px 0 0;max-width:520px;
+}
+.about-text{max-width:640px;font-size:16.5px;color:rgba(19,36,25,0.85);}
+.about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:start;}
+@media(max-width:760px){.about-grid{grid-template-columns:1fr;}}
+.about-side{display:flex;flex-direction:column;gap:18px;}
+.about-side .side-block{padding:16px 18px;border:1px solid var(--line-light);background:var(--canvas-card);}
+.about-side .side-block h4{
+  font-family:var(--font-mono);font-size:11px;text-transform:lowercase;color:var(--amber-dim);
+  margin:0 0 8px;letter-spacing:0.02em;
+}
+.about-side .side-block p{margin:0;font-size:14px;color:rgba(19,36,25,0.85);}
+.about-side .side-block .role-name{font-family:var(--font-display);font-weight:600;font-size:16px;margin:0 0 2px;}
+.about-side .side-block .role-sub{font-family:var(--font-mono);font-size:11.5px;color:rgba(19,36,25,0.55);}
+
+/* ---------- capabilities ---------- */
+.cap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+@media(max-width:760px){.cap-grid{grid-template-columns:1fr;}}
+.cap-card{background:var(--canvas-card);border:1px solid var(--line-light);padding:24px 26px 26px;position:relative;}
+.cap-num{font-family:var(--font-mono);font-size:12px;color:var(--amber-dim);}
+.cap-title{font-family:var(--font-display);font-weight:600;font-size:19px;margin:8px 0 8px;}
+.cap-desc{font-size:14px;color:rgba(19,36,25,0.82);margin-bottom:14px;}
+.cap-tags{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* ---------- experience ---------- */
+.exp-item{margin-bottom:28px;}
+.exp-item .bbox-label{top:-11px;}
+.exp-head{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;
+}
+.exp-role{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0;}
+.exp-org{font-family:var(--font-mono);font-size:12.5px;color:var(--amber-dim);}
+.exp-period{font-family:var(--font-mono);font-size:12px;color:rgba(19,36,25,0.55);white-space:nowrap;}
+.exp-tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px;}
+.exp-bullets{margin:0;padding-left:18px;color:rgba(19,36,25,0.85);}
+.exp-bullets li{margin-bottom:6px;font-size:14.5px;}
+
+/* ---------- flagship case studies ---------- */
+.case-study{margin-bottom:56px;}
+.case-study:last-child{margin-bottom:0;}
+.case-head{margin-bottom:26px;}
+.case-eyebrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.case-title{font-family:var(--font-display);font-weight:600;font-size:clamp(24px,3vw,32px);margin:0 0 6px;}
+.case-sub{font-family:var(--font-mono);font-size:12px;color:var(--amber-dim);text-transform:uppercase;letter-spacing:0.03em;margin-bottom:16px;}
+.case-meta{display:flex;flex-wrap:wrap;gap:10px 22px;font-family:var(--font-mono);font-size:12.5px;color:rgba(19,36,25,0.62);}
+.case-meta span b{color:var(--ink);font-weight:600;}
+
+/* stacked, full-width rhythm: problem -> results -> process -> gallery */
+.case-label{
+  font-family:var(--font-mono);font-size:11px;text-transform:lowercase;color:var(--amber-dim);
+  margin:0 0 12px;letter-spacing:0.02em;display:block;
+}
+.case-block{margin-bottom:30px;}
+.case-block:last-of-type{margin-bottom:0;}
+.case-block > p{margin:0;font-size:15px;color:rgba(19,36,25,0.85);max-width:720px;}
+
+.case-stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line-light);border:1px solid var(--line-light);}
+.case-stat-strip .cs{background:var(--canvas-card);padding:16px 18px;}
+.case-stat-strip .cs .v{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.1;}
+.case-stat-strip .cs .k{font-family:var(--font-mono);font-size:10px;color:rgba(19,36,25,0.55);text-transform:lowercase;margin-top:5px;line-height:1.4;}
+
+.case-timeline{list-style:none;margin:0;padding:0;}
+.case-timeline li{display:grid;grid-template-columns:38px 1fr;column-gap:16px;position:relative;padding-bottom:24px;}
+.case-timeline li:last-child{padding-bottom:0;}
+.case-timeline li::before{
+  content:"";position:absolute;left:18px;top:38px;bottom:2px;width:1px;
+  background:var(--line-light);
+}
+.case-timeline li:last-child::before{display:none;}
+.tl-num{
+  width:37px;height:37px;border:1px solid var(--amber);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:12px;color:var(--amber-dim);
+  background:var(--canvas-card);position:relative;z-index:1;
+}
+.tl-title{font-family:var(--font-display);font-weight:600;font-size:16px;margin:6px 0 5px;}
+.tl-desc{font-size:14px;color:rgba(19,36,25,0.8);margin:0;max-width:600px;}
+
+.case-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;}
+.case-gallery.wide{grid-template-columns:1fr;}
+.case-gallery figure{margin:0;border:1px solid var(--line-light);background:var(--canvas-card);padding:8px;}
+.case-gallery img{width:100%;height:210px;object-fit:contain;background:var(--canvas-light);border-radius:2px;}
+.case-gallery.wide img{height:auto;max-height:440px;}
+.case-gallery figcaption{font-family:var(--font-mono);font-size:10.5px;color:rgba(19,36,25,0.5);margin-top:8px;text-align:center;text-transform:lowercase;}
+
+.case-link{
+  display:inline-flex;align-items:center;gap:6px;margin-top:4px;
+  font-family:var(--font-mono);font-size:12.5px;text-decoration:none;color:var(--amber-dim);
+  border-bottom:1px solid var(--amber-dim);
+}
+.case-link:hover{color:var(--amber);border-color:var(--amber);}
+.case-divider{border:none;border-top:1px dashed var(--line-light);margin:56px 0 0;}
+@media(max-width:640px){
+  .case-timeline li{grid-template-columns:32px 1fr;}
+  .tl-num{width:32px;height:32px;font-size:11px;}
+  .case-timeline li::before{left:15.5px;}
+}
+
+/* ---------- projects ---------- */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+.proj-card{background:var(--canvas-card);border:1px solid var(--line-light);padding:22px 22px 24px;position:relative;}
+.proj-card .bbox-label{background:var(--canvas-light);}
+.proj-title{font-family:var(--font-display);font-weight:600;font-size:18px;margin:6px 0 4px;}
+.proj-period{font-family:var(--font-mono);font-size:11.5px;color:rgba(19,36,25,0.5);margin-bottom:10px;}
+.proj-desc{font-size:14px;color:rgba(19,36,25,0.82);margin-bottom:14px;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* ---------- education / certs ---------- */
+.edu-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;}
+@media(max-width:760px){.edu-grid{grid-template-columns:1fr;}}
+.edu-degree{font-family:var(--font-display);font-weight:600;font-size:20px;margin:8px 0 2px;}
+.edu-school{font-family:var(--font-mono);font-size:12.5px;color:var(--amber-dim);}
+.edu-period{font-family:var(--font-mono);font-size:12px;color:rgba(19,36,25,0.55);margin-top:2px;}
+.edu-detail{font-size:14.5px;margin-top:10px;color:rgba(19,36,25,0.85);}
+.cert-list{list-style:none;margin:0;padding:0;}
+.cert-list li{
+  font-size:14px;padding:9px 0;border-bottom:1px solid var(--line-light);
+  display:flex;gap:10px;align-items:baseline;justify-content:space-between;
+}
+.cert-list li::before{content:"\2713";font-family:var(--font-mono);color:var(--sage);font-size:12px;margin-right:auto;order:-1;}
+.cert-list li .cert-year{font-family:var(--font-mono);font-size:11.5px;color:rgba(19,36,25,0.45);white-space:nowrap;}
+
+/* ---------- skills ---------- */
+.skill-group{margin-bottom:22px;}
+.skill-group h3{
+  font-family:var(--font-mono);font-size:12px;text-transform:lowercase;color:var(--amber-dim);
+  margin:0 0 10px;letter-spacing:0.02em;
+}
+.skill-group h3::before{content:"class: ";color:rgba(19,36,25,0.4);}
+.skill-chips{display:flex;flex-wrap:wrap;gap:7px;}
+
+/* ---------- footer / contact ---------- */
+footer{
+  background:var(--canvas-dark);color:var(--canvas-light);padding:64px 0 40px;
+}
+.contact-head{font-family:var(--font-display);font-weight:600;font-size:clamp(28px,4vw,42px);margin:0 0 10px;}
+.contact-sub{color:rgba(243,239,225,0.7);max-width:480px;margin-bottom:30px;}
+.contact-links{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:48px;}
+.contact-links a{
+  font-family:var(--font-mono);font-size:13px;text-decoration:none;
+  border:1px solid var(--line-dark);padding:9px 14px;border-radius:2px;color:var(--canvas-light);
+  transition:border-color .2s, color .2s;
+}
+.contact-links a:hover{border-color:var(--amber);color:var(--amber);}
+.foot-bottom{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  border-top:1px solid var(--line-dark);padding-top:20px;
+  font-family:var(--font-mono);font-size:11.5px;color:rgba(243,239,225,0.5);
+}
+
+/* ---------- reveal on scroll ---------- */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+  .bbox::before,.bbox::after,.bbox .corner-tl,.bbox .corner-br{transition:none;}
+}
+
+@media(max-width:640px){
+  section{padding:56px 0;}
+  .exp-head{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow-row">
+      <span class="tag"><span class="dot"></span>status: open_to_work</span>
+      <span class="tag">loc: Pekanbaru, Indonesia</span>
+    </div>
+    <div class="hero-frame">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label on-dark">class: AI_&_Data_Analyst · conf: 0.97</div>
+      <h1 class="name">Sarifah Muliani</h1>
+      <div class="role-line">AI & Data Analyst <span class="conf">// pekanbaru, indonesia</span></div>
+      <p class="tagline">Informatics Engineering graduate from UIN SUSKA Riau, now building chatbots, annotating datasets, and training computer vision models for real-world problems in agriculture and healthcare.</p>
+      <div class="meta-row">
+        <span>0822-6890-3541</span>
+        <span>·</span>
+        <a href="mailto:sarifamulyani2@gmail.com">sarifamulyani2@gmail.com</a>
+        <span>·</span>
+        <a href="https://www.linkedin.com/in/sarifahmuliani/" target="_blank" rel="noopener">LinkedIn</a>
+        <span>·</span>
+        <a href="https://github.com/SarifahMuliani" target="_blank" rel="noopener">GitHub</a>
+        <span>·</span>
+        <a href="https://www.kaggle.com/sarifahmuliani" target="_blank" rel="noopener">Kaggle</a>
+      </div>
+    </div>
+    <div class="metric-strip">
+      <div class="m"><div class="v">0.94</div><div class="k">chatbot_faithfulness</div></div>
+      <div class="m"><div class="v">0.88</div><div class="k">chatbot_recall</div></div>
+      <div class="m"><div class="v">96%</div><div class="k">thesis_model_accuracy</div></div>
+      <div class="m"><div class="v">1,000+</div><div class="k">images_annotated</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="about">
+    <div class="section-head reveal">
+      <span class="tag">01 · profile</span>
+      <h2>Applied AI, grounded in real operational data.</h2>
+      <p class="kicker">Structuring what's messy — chatlogs, dataset labels, and X-ray scans — into systems people can trust.</p>
+    </div>
+    <div class="about-grid">
+      <p class="about-text reveal">I'm an Informatics Engineering graduate from UIN SUSKA Riau, now working as an AI & Data Analyst at PT. Digital Sawit Pro. My day-to-day sits at the intersection of applied AI and real field data: deploying a multi-channel agronomy chatbot, annotating agricultural imagery for computer-vision training, and turning raw WhatsApp logistics logs into structured datasets that people can actually monitor and report on.
+      <br><br>My undergraduate thesis applied SHAP explainability to a deep-learning model for chest X-ray classification — the same instinct for making a model's decisions legible now shows up in how I approach plantation-health data: every label, every dataset, checked and structured before it feeds a model.</p>
+      <div class="about-side reveal">
+        <div class="side-block">
+          <h4>current role</h4>
+          <p class="role-name">AI & Data Analyst Intern</p>
+          <p class="role-sub">PT. Digital Sawit Pro · Pekanbaru</p>
+          <p style="margin-top:8px;">Jan 2026 – present</p>
+        </div>
+        <div class="side-block">
+          <h4>education</h4>
+          <p class="role-name">B.Sc. Informatics Engineering</p>
+          <p class="role-sub">UIN SUSKA Riau · GPA 3.32 / 4.00</p>
+        </div>
+        <div class="side-block">
+          <h4>certified</h4>
+          <p>Data Analytics (Deloitte) · Data Labeling (Forage) · Understanding Data (Myskill)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="capabilities">
+    <div class="section-head reveal">
+      <span class="tag">02 · core capabilities</span>
+      <h2>Where the skill set actually gets applied.</h2>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card reveal">
+        <span class="cap-num">01</span>
+        <p class="cap-title">Conversational AI & Chatbot Platforms</p>
+        <p class="cap-desc">Multi-channel chatbot design and deployment, workflow orchestration, Q&A pair generation, knowledge-base structuring.</p>
+        <div class="cap-tags"><span class="chip">Dify</span><span class="chip">Docker</span><span class="chip">Redis</span><span class="chip">ChromaDB</span><span class="chip">Vertex AI</span><span class="chip">LLM</span></div>
+      </div>
+      <div class="cap-card reveal">
+        <span class="cap-num">02</span>
+        <p class="cap-title">Data Annotation</p>
+        <p class="cap-desc">High-volume image annotation for CV model training, and improving the labeling tools that annotation work depends on.</p>
+        <div class="cap-tags"><span class="chip">LabelMe</span><span class="chip">TensorFlow / Keras</span></div>
+      </div>
+      <div class="cap-card reveal">
+        <span class="cap-num">03</span>
+        <p class="cap-title">Explainable AI</p>
+        <p class="cap-desc">Training CNNs on medical imaging and applying SHAP so a model's predictions can be audited, not just trusted blindly.</p>
+        <div class="cap-tags"><span class="chip">VGG-16</span><span class="chip">SHAP</span><span class="chip">Keras</span><span class="chip">Deep Learning</span></div>
+      </div>
+      <div class="cap-card reveal">
+        <span class="cap-num">04</span>
+        <p class="cap-title">Data Structuring & Analytics</p>
+        <p class="cap-desc">Turning unstructured field and chat logs into clean datasets ready for monitoring, reporting, and downstream models.</p>
+        <div class="cap-tags"><span class="chip">Python (Pandas, NumPy)</span><span class="chip">SQL</span><span class="chip">Tableau</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="section-head reveal">
+      <span class="tag">03 · experience</span>
+      <h2>Work experience</h2>
+    </div>
+
+    <div class="bbox exp-item reveal">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label">1 / 3</div>
+      <div class="exp-head">
+        <div>
+          <p class="exp-role">AI & Data Analyst Intern</p>
+          <span class="exp-org">PT. Digital Sawit Pro</span>
+        </div>
+        <span class="exp-period">Jan 2026 – present</span>
+      </div>
+      <div class="exp-tags">
+        <span class="chip">Dify</span><span class="chip">Docker</span><span class="chip">LabelMe</span><span class="chip">Android Studio</span>
+      </div>
+      <ul class="exp-bullets">
+        <li>Deployed the 'Sawit Doctor' chatbot across Telegram, WhatsApp & Lark — Faithfulness 0.94, Recall 0.88.</li>
+        <li>Designed chatbot structure and workflows using Dify/Docker for end-to-end deployment.</li>
+        <li>Annotated 1,000+ agricultural image datasets in LabelMe to support computer vision model development.</li>
+        <li>Turned 500+ daily WhatsApp logistics records into structured datasets for monitoring and reporting.</li>
+        <li>Improved an image-labeler web tool's annotation features and overall usability.</li>
+        <li>Designed UI/UX mockups in Google Stitch to integrate Sawit Doctor across internal apps.</li>
+        <li>Built a working Android chatbot prototype in Android Studio to validate the mobile experience.</li>
+      </ul>
+    </div>
+
+    <div class="bbox exp-item reveal">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label">2 / 3</div>
+      <div class="exp-head">
+        <div>
+          <p class="exp-role">Sales Trainee</p>
+          <span class="exp-org">Ruangguru</span>
+        </div>
+        <span class="exp-period">Dec 2025 – Jan 2026</span>
+      </div>
+      <div class="exp-tags">
+        <span class="chip">Outreach</span><span class="chip">CRM</span><span class="chip">Scheduling</span>
+      </div>
+      <ul class="exp-bullets">
+        <li>Promoted SkillAcademy & Ruangguru products via direct and digital outreach, converting 2 clients in one month.</li>
+        <li>Managed tutoring schedules and coordinated learning sessions for prospective students.</li>
+        <li>Organized outreach events across 5 schools within one month to expand student acquisition.</li>
+        <li>Contacted 100+ users in a single day as part of high-volume digital outreach campaigns.</li>
+      </ul>
+    </div>
+
+    <div class="bbox exp-item reveal">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label">3 / 3</div>
+      <div class="exp-head">
+        <div>
+          <p class="exp-role">Data Entry</p>
+          <span class="exp-org">Perum Bulog</span>
+        </div>
+        <span class="exp-period">Oct 2025 – Dec 2025</span>
+      </div>
+      <div class="exp-tags">
+        <span class="chip">Data Validation</span><span class="chip">Records</span>
+      </div>
+      <ul class="exp-bullets">
+        <li>Digitized and validated ~700 rice-aid recipient records per day across Kampar Regency with high accuracy.</li>
+        <li>Filtered and processed 500+ data entries daily to keep records clean and accurate.</li>
+        <li>Input citizen identity data into the official system at a rate of 500 entries per day.</li>
+        <li>Cross-checked user data across multiple sources to maintain consistency.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="flagship">
+    <div class="section-head reveal">
+      <span class="tag">04 · flagship projects</span>
+      <h2>Case studies</h2>
+      <p class="kicker">Three projects, end to end — the problem, what was built, and what it moved.</p>
+    </div>
+
+    <!-- Case study 1: Doctor Sawit AI -->
+    <div class="case-study reveal">
+      <div class="case-head">
+        <div class="case-eyebrow">
+          <span class="tag">conversational ai</span>
+          <span class="tag">flagship project</span>
+        </div>
+        <h3 class="case-title">Doctor Sawit AI</h3>
+        <p class="case-sub">Multi-channel agronomy chatbot · PT. Digital Sawit Pro</p>
+        <div class="case-meta">
+          <span>role: <b>AI & Data Analyst Intern</b></span>
+          <span>period: <b>Jan 2026 – present</b></span>
+          <span>channels: <b>Telegram · WhatsApp · Lark · Android</b></span>
+        </div>
+      </div>
+      <div class="case-block">
+        <span class="case-label">the problem</span>
+        <p>Smallholder plantation farmers needed fast, reliable agronomy answers reachable from the channels they already use — not a separate app to learn. The chatbot logic also needed to be structured and repeatable enough to deploy consistently across very different messaging platforms.</p>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">results</span>
+        <div class="case-stat-strip">
+          <div class="cs"><div class="v">0.94</div><div class="k">faithfulness — answers grounded in retrieved context</div></div>
+          <div class="cs"><div class="v">0.88</div><div class="k">context recall across 100+ question eval</div></div>
+          <div class="cs"><div class="v">~0.6s</div><div class="k">mean first-token latency</div></div>
+          <div class="cs"><div class="v">≤20%</div><div class="k">escalation rate to human agronomist</div></div>
+        </div>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">workflow to deployment</span>
+        <ol class="case-timeline">
+          <li>
+            <span class="tl-num">01</span>
+            <div>
+              <p class="tl-title">Workflow design</p>
+              <p class="tl-desc">Designed the chatbot's structure and conversation workflows in Dify, containerized with Docker for repeatable end-to-end deployment.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">02</span>
+            <div>
+              <p class="tl-title">Multi-channel rollout</p>
+              <p class="tl-desc">Deployed the same underlying chatbot logic across Telegram, WhatsApp, and Lark for consistent answers on any app.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">03</span>
+            <div>
+              <p class="tl-title">Mobile validation</p>
+              <p class="tl-desc">Built a working Android chatbot prototype in Android Studio to validate the mobile experience on the same backend.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">04</span>
+            <div>
+              <p class="tl-title">UX integration</p>
+              <p class="tl-desc">Designed UI/UX mockups in Google Stitch to integrate Sawit Doctor cleanly across internal apps.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">screens</span>
+        <div class="case-gallery">
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-17 155523.png" alt="Dokter Sawit mobile app — plantation health check screen"><figcaption>mobile · health check</figcaption></figure>
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-17 155550.png" alt="Dokter Sawit mobile app screen"><figcaption>mobile · chat</figcaption></figure>
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-17 155616.png" alt="Dokter Sawit mobile app screen"><figcaption>mobile · diagnosis</figcaption></figure>
+        </div>
+        <div class="case-gallery wide" style="margin-top:14px;">
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-18 004254.png" alt="Dokter Sawit website interface"><figcaption>website · dokter sawit</figcaption></figure>
+        </div>
+      </div>
+    </div>
+
+    <hr class="case-divider">
+
+    <!-- Case study 2: Plantation-Health Data Pipeline -->
+    <div class="case-study reveal" style="margin-top:56px;">
+      <div class="case-head">
+        <div class="case-eyebrow">
+          <span class="tag">computer vision · data</span>
+          <span class="tag">flagship project</span>
+        </div>
+        <h3 class="case-title">Plantation-Health Data Pipeline</h3>
+        <p class="case-sub">Image annotation & field-data structuring · PT. Digital Sawit Pro</p>
+        <div class="case-meta">
+          <span>role: <b>AI & Data Analyst Intern</b></span>
+          <span>period: <b>Jan 2026 – present</b></span>
+          <span>output: <b>1,000+ images · 500+ records/day</b></span>
+        </div>
+      </div>
+      <div class="case-block">
+        <span class="case-label">the problem</span>
+        <p>Reliable computer-vision models for plantation health depend on large volumes of accurately labeled imagery, and the internal labeling tool wasn't efficient enough for the annotation volume needed. Daily WhatsApp logistics reports were unstructured text — useful in the moment, unusable for monitoring.</p>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">results</span>
+        <div class="case-stat-strip">
+          <div class="cs"><div class="v">1,000+</div><div class="k">images annotated</div></div>
+          <div class="cs"><div class="v">500+</div><div class="k">records structured / day</div></div>
+          <div class="cs"><div class="v">1</div><div class="k">labeling tool improved</div></div>
+          <div class="cs"><div class="v">2</div><div class="k">data types unified</div></div>
+        </div>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">what I built</span>
+        <ol class="case-timeline">
+          <li>
+            <span class="tl-num">01</span>
+            <div>
+              <p class="tl-title">Image annotation at volume</p>
+              <p class="tl-desc">Annotated 1,000+ agricultural images in LabelMe to support computer-vision model development for plantation-health detection.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">02</span>
+            <div>
+              <p class="tl-title">Tooling improvements</p>
+              <p class="tl-desc">Improved the internal image-labeler web tool's annotation features and usability, speeding up labeling throughput for the whole team.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">03</span>
+            <div>
+              <p class="tl-title">Field-data structuring</p>
+              <p class="tl-desc">Turned 500+ daily WhatsApp logistics records into structured datasets, ready for monitoring and reporting.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">tool</span>
+        <div class="case-gallery wide">
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-18 010752.png" alt="Internal image annotation tool interface"><figcaption>internal labeling tool</figcaption></figure>
+        </div>
+      </div>
+    </div>
+
+    <hr class="case-divider">
+
+    <!-- Case study 3: Lung Disease Detection with SHAP -->
+    <div class="case-study reveal" style="margin-top:56px;">
+      <div class="case-head">
+        <div class="case-eyebrow">
+          <span class="tag">deep learning · xai</span>
+          <span class="tag">flagship project</span>
+        </div>
+        <h3 class="case-title">Lung Disease Detection with SHAP</h3>
+        <p class="case-sub">Undergraduate thesis · UIN SUSKA Riau</p>
+        <div class="case-meta">
+          <span>role: <b>Sole researcher</b></span>
+          <span>period: <b>2025</b></span>
+          <span>data: <b>3,030 chest X-ray images</b></span>
+        </div>
+      </div>
+      <div class="case-block">
+        <span class="case-label">the problem</span>
+        <p>Deep-learning models for medical image classification often function as black boxes — accurate, but clinically risky without insight into why a prediction was made. The goal: a chest X-ray classifier accurate enough to be useful, with predictions a clinician could actually audit.</p><br>
+        <p>This project explores the application of Explainable AI (XAI) using SHAP to improve the interpretability of a deep learning model for chest X-ray disease classification. A VGG-16-based model was trained to classify chest X-ray images into COVID-19, Normal, and Pneumonia. SHAP visualizations were then used to highlight the image regions that contributed most to the model's predictions, providing insight into the decision-making process and increasing model transparency.</p>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">results</span>
+        <div class="case-stat-strip">
+          <div class="cs"><div class="v">96%</div><div class="k">classification accuracy</div></div>
+          <div class="cs"><div class="v">3,030</div><div class="k">chest X-ray images</div></div>
+          <div class="cs"><div class="v">3</div><div class="k">diagnostic classes</div></div>
+          <div class="cs"><div class="v">1</div><div class="k">explainability layer (SHAP)</div></div>
+        </div>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">pipeline</span>
+        <ol class="case-timeline">
+          <li>
+            <span class="tl-num">01</span>
+            <div>
+              <p class="tl-title">Dataset</p>
+              <p class="tl-desc">Curated a 3,030-image chest X-ray dataset spanning three classes: COVID-19, Pneumonia, and Normal.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">02</span>
+            <div>
+              <p class="tl-title">Model training</p>
+              <p class="tl-desc">Trained a VGG-16 convolutional network via transfer learning to classify chest X-rays across the three classes.</p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num">03</span>
+            <div>
+              <p class="tl-title">Explainability</p>
+              <p class="tl-desc">Applied SHAP to visualize which regions of each X-ray drove the model's prediction — inspectable, not just trusted.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">approach</span>
+        <div class="cap-tags" style="margin-top:14px;">
+          <span class="chip">VGG-16</span><span class="chip">Keras</span><span class="chip">Deep Learning</span><span class="chip">SHAP</span>
+        </div>
+        <a class="case-link" href="https://www.kaggle.com/code/sarifahmuliani/shap-in-deep-learning" target="_blank" rel="noopener">show code — kaggle.com/code/sarifahmuliani/shap-in-deep-learning →</a>
+      </div>
+
+      <div class="case-block">
+        <span class="case-label">shap visualization</span>
+        <div class="case-gallery wide">
+          <figure><img src="C:\Users\user\Downloads\files\img\Screenshot 2026-07-17 172933.png" alt="SHAP visualization on chest X-ray — COVID, Normal, Pneumonia"><figcaption>shap · region attribution</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="section-head reveal">
+      <span class="tag">05 · selected earlier work</span>
+      <h2>Product & design range beyond the core AI work.</h2>
+    </div>
+    <div class="proj-grid">
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_01</div>
+        <p class="proj-title">Dokter Sawit — Android App</p>
+        <p class="proj-period">2026 · Personal Project</p>
+        <p class="proj-desc">Native Android chat app wrapping the Sawit Doctor chatbot logic — message bubbles, session handling, API integration in Kotlin.</p>
+        <div class="proj-tags">
+          <span class="chip">Kotlin</span><span class="chip">Android Studio</span>
+        </div>
+      </div>
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_02</div>
+        <p class="proj-title">KebunPRO — Health Dashboard</p>
+        <p class="proj-period">2026 · Product Design</p>
+        <p class="proj-desc">Mobile app flow for plantation monitoring: camera disease capture, AI diagnosis with confidence score, treatment plans, history.</p>
+        <div class="proj-tags">
+          <span class="chip">Figma</span>
+        </div>
+      </div>
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_03</div>
+        <p class="proj-title">Aisyah — Food Ordering App</p>
+        <p class="proj-period">2026 · UI/UX Design</p>
+        <p class="proj-desc">End-to-end ordering flow — onboarding, authentication, menu browsing, discounts, checkout, order tracking.</p>
+        <div class="proj-tags">
+          <span class="chip">Figma</span>
+        </div>
+      </div>
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_05</div>
+        <p class="proj-title">Company Profile Website</p>
+        <p class="proj-period">2024 · PT. MSI</p>
+        <p class="proj-desc">Responsive company-profile site, alongside B2B prospecting that identified 200+ potential partners in one day.</p>
+        <div class="proj-tags">
+          <span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">JavaScript</span>
+        </div>
+      </div>
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_06</div>
+        <p class="proj-title">Futsal Field Booking App</p>
+        <p class="proj-period">2023 · UI/UX Design</p>
+        <p class="proj-desc">Responsive booking app in Figma, shaped by user research and iterative review cycles.</p>
+        <div class="proj-tags">
+          <span class="chip">Figma</span>
+        </div>
+      </div>
+
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_07</div>
+        <p class="proj-title">Outreach & Records Work</p>
+        <p class="proj-period">2025 · Ruangguru / Bulog</p>
+        <p class="proj-desc">Sales trainee outreach (100+ users/day) and data-entry validation of ~700 records/day across Kampar Regency.</p>
+        <div class="proj-tags">
+          <span class="chip">CRM</span><span class="chip">Data Validation</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="section-head reveal">
+      <span class="tag">06 · education</span>
+      <h2>Where the fundamentals were built.</h2>
+    </div>
+    <div class="edu-grid">
+      <div class="bbox reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">degree</div>
+        <p class="edu-degree">Bachelor of Informatics Engineering</p>
+        <span class="edu-school">UIN SUSKA RIAU</span>
+        <div class="edu-period">Jul 2021 – Oct 2025</div>
+        <p class="edu-detail">Faculty of Science and Technology · GPA 3.32 / 4.00<br>Thesis: Application of SHAP in Deep Learning for Lung Disease Detection using X-Ray Images.</p>
+      </div>
+      <div class="reveal">
+        <ul class="cert-list">
+          <li><span>Java — Sololearn</span><span class="cert-year">2021</span></li>
+          <li><span>Data Analytics — Deloitte Virtual Internship</span><span class="cert-year">2024</span></li>
+          <li><span>Data Labeling — Forage (Intent, Sentiment, PII)</span><span class="cert-year">2025</span></li>
+          <li><span>Understanding Data — Myskill</span><span class="cert-year">2025</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="section-head reveal">
+      <span class="tag">07 · skills</span>
+      <h2>Skill labels</h2>
+    </div>
+
+    <div class="skill-group reveal">
+      <h3>technical</h3>
+      <div class="skill-chips">
+        <span class="chip">Python (Pandas, NumPy)</span><span class="chip">HTML/CSS/JS</span><span class="chip">TensorFlow / Keras</span><span class="chip">Deep Learning</span><span class="chip">SQL</span><span class="chip">Redis</span>
+      </div>
+    </div>
+
+    <div class="skill-group reveal">
+      <h3>ai_&_chatbot</h3>
+      <div class="skill-chips">
+        <span class="chip">Conversational AI Design</span><span class="chip">Chatbot Training</span><span class="chip">Knowledge Base Structuring</span><span class="chip">Q&A Pair Generation</span><span class="chip">NoCode (Dify)</span><span class="chip">ANN</span><span class="chip">LangChain</span><span class="chip">CNN</span>
+      </div>
+    </div>
+
+    <div class="skill-group reveal">
+      <h3>tools</h3>
+      <div class="skill-chips">
+        <span class="chip">VS Code</span><span class="chip">Google Colab</span><span class="chip">Jupyter</span><span class="chip">Docker</span><span class="chip">Dify</span><span class="chip">LabelMe</span><span class="chip">Git/GitHub</span><span class="chip">Figma</span><span class="chip">Canva</span><span class="chip">Tableau</span><span class="chip">Vertex AI</span><span class="chip">Google Stitch</span>
+      </div>
+    </div>
+
+    <div class="skill-group reveal">
+      <h3>languages</h3>
+      <div class="skill-chips">
+        <span class="chip">Indonesian (Native)</span><span class="chip">English (Basic)</span>
+      </div>
+    </div>
+
+    <div class="skill-group reveal">
+      <h3>soft_skills</h3>
+      <div class="skill-chips">
+        <span class="chip">Teamwork</span><span class="chip">Communication</span><span class="chip">Attention to Detail</span><span class="chip">Customer Engagement</span><span class="chip">Fast Learner</span><span class="chip">Problem Solving</span>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <p class="contact-head reveal">Data structured. Models explained. Systems people actually use.</p>
+    <p class="contact-sub reveal">Open to AI/ML, data analyst, and computer-vision roles — reach out any time.</p>
+    <div class="contact-links reveal">
+      <a href="mailto:sarifamulyani2@gmail.com">sarifamulyani2@gmail.com</a>
+      <a href="tel:082268903541">0822-6890-3541</a>
+      <a href="https://www.linkedin.com/in/sarifahmuliani/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/SarifahMuliani" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.kaggle.com/sarifahmuliani" target="_blank" rel="noopener">Kaggle</a>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Sarifah Muliani</span>
+      <span>built with html + css + js</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function (el) { io.observe(el); });
+});
+</script>
+</body>
+</html>

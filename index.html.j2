@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ name }} — {{ role }}</title>
+<meta name="description" content="{{ tagline }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#132419;
+  --canvas-dark:#122318;
+  --canvas-dark-2:#1B3324;
+  --canvas-light:#F3EFE1;
+  --canvas-card:#FBF9F1;
+  --amber:#D9A441;
+  --amber-dim:#B98A34;
+  --sage:#7FA688;
+  --line-dark:rgba(243,239,225,0.18);
+  --line-light:rgba(19,36,25,0.14);
+  --font-display:'Fraunces', serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --font-body:'Inter', sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--canvas-light);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px;}
+
+/* ---------- annotation tag primitive ---------- */
+.tag{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:0.02em;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border:1px solid currentColor;
+  border-radius:2px;
+  color:var(--amber);
+  text-transform:lowercase;
+}
+.tag .dot{width:5px;height:5px;background:currentColor;border-radius:50%;display:inline-block;}
+.chip{
+  font-family:var(--font-mono);
+  font-size:12.5px;
+  padding:5px 11px;
+  border:1px solid var(--line-light);
+  border-radius:3px;
+  color:var(--ink);
+  background:var(--canvas-card);
+  display:inline-block;
+  white-space:nowrap;
+}
+
+/* ---------- bbox frame: the signature element ---------- */
+.bbox{
+  position:relative;
+  border:1px dashed var(--line-light);
+  padding:clamp(20px,4vw,48px);
+}
+.bbox::before,.bbox::after,
+.bbox .corner-tl,.bbox .corner-br{
+  content:"";
+  position:absolute;
+  width:16px;height:16px;
+  border-color:var(--amber);
+  border-style:solid;
+  transition:transform .35s ease;
+}
+.bbox::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.bbox::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.bbox .corner-tl{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.bbox .corner-br{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+.bbox:hover::before{transform:translate(-3px,-3px);}
+.bbox:hover::after{transform:translate(3px,3px);}
+.bbox:hover .corner-tl{transform:translate(3px,-3px);}
+.bbox:hover .corner-br{transform:translate(-3px,3px);}
+.bbox-label{
+  position:absolute;
+  top:-11px;left:16px;
+  background:var(--canvas-light);
+  padding:0 8px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--amber-dim);
+  text-transform:lowercase;
+}
+.bbox-label.on-dark{background:var(--canvas-dark);color:var(--amber);}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    linear-gradient(180deg, var(--canvas-dark) 0%, var(--canvas-dark-2) 100%);
+  color:var(--canvas-light);
+  position:relative;
+  overflow:hidden;
+  padding:96px 0 88px;
+}
+.hero::before{
+  content:"";
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--line-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+  background-size:48px 48px;
+  opacity:0.35;
+  mask-image:radial-gradient(ellipse at center, black 0%, transparent 75%);
+}
+.hero-inner{position:relative;z-index:1;}
+.eyebrow-row{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin-bottom:28px;
+}
+.hero-frame{position:relative;padding:36px clamp(20px,5vw,56px) 40px;border:1px dashed var(--line-dark);}
+.hero-frame::before,.hero-frame::after,.hero-frame .corner-tl,.hero-frame .corner-br{
+  content:"";position:absolute;width:20px;height:20px;border-color:var(--amber);border-style:solid;
+}
+.hero-frame::before{top:-1px;left:-1px;border-width:2px 0 0 2px;}
+.hero-frame::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+.hero-frame .corner-tl{top:-1px;right:-1px;border-width:2px 2px 0 0;}
+.hero-frame .corner-br{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
+h1.name{
+  font-family:var(--font-display);
+  font-optical-sizing:auto;
+  font-weight:600;
+  font-size:clamp(40px,7vw,76px);
+  line-height:0.98;
+  margin:0 0 14px;
+  letter-spacing:-0.01em;
+}
+.role-line{
+  font-family:var(--font-mono);
+  font-size:clamp(13px,1.6vw,16px);
+  color:var(--amber);
+  margin-bottom:18px;
+}
+.role-line span.conf{color:var(--sage);}
+.tagline{
+  max-width:560px;
+  font-size:17px;
+  color:rgba(243,239,225,0.82);
+  margin:0 0 26px;
+}
+.meta-row{
+  display:flex;flex-wrap:wrap;gap:8px 10px;
+  font-family:var(--font-mono);font-size:12.5px;
+  color:rgba(243,239,225,0.65);
+}
+.meta-row a{text-decoration:none;border-bottom:1px solid transparent;}
+.meta-row a:hover{border-color:var(--amber);color:var(--amber);}
+.metric-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:1px;margin-top:44px;
+  background:var(--line-dark);
+  border:1px solid var(--line-dark);
+}
+.metric-strip .m{
+  background:var(--canvas-dark);
+  padding:16px 18px;
+}
+.metric-strip .m .v{
+  font-family:var(--font-display);font-weight:600;font-size:26px;color:var(--canvas-light);
+}
+.metric-strip .m .k{
+  font-family:var(--font-mono);font-size:10.5px;color:var(--amber-dim);text-transform:lowercase;margin-top:2px;
+}
+
+/* ---------- section scaffolding ---------- */
+section{padding:76px 0;}
+.section-head{margin-bottom:38px;position:relative;padding-left:18px;border-left:2px solid var(--amber);}
+.section-head .tag{margin-bottom:10px;}
+.section-head h2{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,36px);
+  margin:0;letter-spacing:-0.01em;
+}
+.about-text{max-width:640px;font-size:16.5px;color:rgba(19,36,25,0.85);}
+
+/* ---------- experience ---------- */
+.exp-item{margin-bottom:28px;}
+.exp-item .bbox-label{top:-11px;}
+.exp-head{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;
+}
+.exp-role{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0;}
+.exp-org{font-family:var(--font-mono);font-size:12.5px;color:var(--amber-dim);}
+.exp-period{font-family:var(--font-mono);font-size:12px;color:rgba(19,36,25,0.55);white-space:nowrap;}
+.exp-tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px;}
+.exp-bullets{margin:0;padding-left:18px;color:rgba(19,36,25,0.85);}
+.exp-bullets li{margin-bottom:6px;font-size:14.5px;}
+
+/* ---------- projects ---------- */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+.proj-card{background:var(--canvas-card);border:1px solid var(--line-light);padding:22px 22px 24px;position:relative;}
+.proj-card .bbox-label{background:var(--canvas-light);}
+.proj-thumb{
+  position:relative;
+  margin:6px 0 14px;
+  border:1px solid var(--line-light);
+  background:var(--canvas-light);
+  overflow:hidden;
+  aspect-ratio:16/10;
+}
+.proj-thumb img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:top;
+  display:block;
+  filter:grayscale(0.15);
+  transition:transform .5s ease, filter .5s ease;
+}
+.proj-card:hover .proj-thumb img{transform:scale(1.035);filter:grayscale(0);}
+.proj-title{font-family:var(--font-display);font-weight:600;font-size:18px;margin:6px 0 4px;}
+.proj-period{font-family:var(--font-mono);font-size:11.5px;color:rgba(19,36,25,0.5);margin-bottom:10px;}
+.proj-desc{font-size:14px;color:rgba(19,36,25,0.82);margin-bottom:14px;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* ---------- education / certs ---------- */
+.edu-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;}
+@media(max-width:760px){.edu-grid{grid-template-columns:1fr;}}
+.edu-degree{font-family:var(--font-display);font-weight:600;font-size:20px;margin:8px 0 2px;}
+.edu-school{font-family:var(--font-mono);font-size:12.5px;color:var(--amber-dim);}
+.edu-period{font-family:var(--font-mono);font-size:12px;color:rgba(19,36,25,0.55);margin-top:2px;}
+.edu-detail{font-size:14.5px;margin-top:10px;color:rgba(19,36,25,0.85);}
+.cert-list{list-style:none;margin:0;padding:0;}
+.cert-list li{
+  font-size:14px;padding:9px 0;border-bottom:1px solid var(--line-light);
+  display:flex;gap:10px;align-items:baseline;
+}
+.cert-list li::before{content:"\2713";font-family:var(--font-mono);color:var(--sage);font-size:12px;}
+
+/* ---------- skills ---------- */
+.skill-group{margin-bottom:22px;}
+.skill-group h3{
+  font-family:var(--font-mono);font-size:12px;text-transform:lowercase;color:var(--amber-dim);
+  margin:0 0 10px;letter-spacing:0.02em;
+}
+.skill-group h3::before{content:"class: ";color:rgba(19,36,25,0.4);}
+.skill-chips{display:flex;flex-wrap:wrap;gap:7px;}
+
+/* ---------- footer / contact ---------- */
+footer{
+  background:var(--canvas-dark);color:var(--canvas-light);padding:64px 0 40px;
+}
+.contact-head{font-family:var(--font-display);font-weight:600;font-size:clamp(28px,4vw,42px);margin:0 0 10px;}
+.contact-sub{color:rgba(243,239,225,0.7);max-width:480px;margin-bottom:30px;}
+.contact-links{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:48px;}
+.contact-links a{
+  font-family:var(--font-mono);font-size:13px;text-decoration:none;
+  border:1px solid var(--line-dark);padding:9px 14px;border-radius:2px;color:var(--canvas-light);
+  transition:border-color .2s, color .2s;
+}
+.contact-links a:hover{border-color:var(--amber);color:var(--amber);}
+.foot-bottom{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  border-top:1px solid var(--line-dark);padding-top:20px;
+  font-family:var(--font-mono);font-size:11.5px;color:rgba(243,239,225,0.5);
+}
+
+/* ---------- reveal on scroll ---------- */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+  .bbox::before,.bbox::after,.bbox .corner-tl,.bbox .corner-br{transition:none;}
+}
+
+@media(max-width:640px){
+  section{padding:56px 0;}
+  .exp-head{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow-row">
+      <span class="tag"><span class="dot"></span>status: open_to_work</span>
+      <span class="tag">loc: {{ location }}</span>
+    </div>
+    <div class="hero-frame">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label on-dark">class: {{ role | replace(" ", "_") }} · conf: {{ confidence }}</div>
+      <h1 class="name">{{ name }}</h1>
+      <div class="role-line">{{ role }} <span class="conf">// pekanbaru, indonesia</span></div>
+      <p class="tagline">{{ tagline }}</p>
+      <div class="meta-row">
+        <span>{{ phone }}</span>
+        <span>·</span>
+        <a href="mailto:{{ email }}">{{ email }}</a>
+        {% for label, url in links.items() %}
+        <span>·</span>
+        {% if url %}<a href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>{% else %}<span>{{ label }}</span>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    <div class="metric-strip">
+      {% for m in metrics %}
+      <div class="m">
+        <div class="v">{{ m.value }}</div>
+        <div class="k">{{ m.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="about">
+    <div class="section-head reveal">
+      <span class="tag">01 · about</span>
+      <h2>Field notes</h2>
+    </div>
+    <p class="about-text reveal">{{ about }}</p>
+  </section>
+
+  <section id="experience">
+    <div class="section-head reveal">
+      <span class="tag">02 · experience</span>
+      <h2>Work experience</h2>
+    </div>
+    {% for job in experience %}
+    <div class="bbox exp-item reveal">
+      <span class="corner-tl"></span><span class="corner-br"></span>
+      <div class="bbox-label">{{ loop.index }} / {{ experience|length }}</div>
+      <div class="exp-head">
+        <div>
+          <p class="exp-role">{{ job.role }}</p>
+          <span class="exp-org">{{ job.org }}</span>
+        </div>
+        <span class="exp-period">{{ job.period }}</span>
+      </div>
+      <div class="exp-tags">
+        {% for t in job.tags %}<span class="chip">{{ t }}</span>{% endfor %}
+      </div>
+      <ul class="exp-bullets">
+        {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section id="projects">
+    <div class="section-head reveal">
+      <span class="tag">03 · projects</span>
+      <h2>Selected projects</h2>
+    </div>
+    <div class="proj-grid">
+      {% for p in projects %}
+      <div class="bbox proj-card reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">obj_0{{ loop.index }}</div>
+        {% if p.image %}
+        <div class="proj-thumb">
+          <img src="{{ p.image }}" alt="{{ p.title }} screenshot" loading="lazy">
+        </div>
+        {% endif %}
+        <p class="proj-title">{{ p.title }}</p>
+        <p class="proj-period">{{ p.period }}</p>
+        <p class="proj-desc">{{ p.description }}</p>
+        <div class="proj-tags">
+          {% for t in p.tags %}<span class="chip">{{ t }}</span>{% endfor %}
+        </div>
+      </div>
+
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="section-head reveal">
+      <span class="tag">04 · education</span>
+      <h2>Education &amp; certifications</h2>
+    </div>
+    <div class="edu-grid">
+      <div class="bbox reveal">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <div class="bbox-label">degree</div>
+        <p class="edu-degree">{{ education.degree }}</p>
+        <span class="edu-school">{{ education.school }}</span>
+        <div class="edu-period">{{ education.period }}</div>
+        <p class="edu-detail">{{ education.detail }}<br>{{ education.thesis }}</p>
+      </div>
+      <div class="reveal">
+        <ul class="cert-list">
+          {% for c in certifications %}<li>{{ c }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="section-head reveal">
+      <span class="tag">05 · skills</span>
+      <h2>Skill labels</h2>
+    </div>
+    {% for group, items in skills.items() %}
+    <div class="skill-group reveal">
+      <h3>{{ group | lower | replace(" ", "_") }}</h3>
+      <div class="skill-chips">
+        {% for s in items %}<span class="chip">{{ s }}</span>{% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <p class="contact-head reveal">Let's build something.</p>
+    <p class="contact-sub reveal">Open to AI/ML, data analyst, and computer-vision roles — reach out any time.</p>
+    <div class="contact-links reveal">
+      <a href="mailto:{{ email }}">{{ email }}</a>
+      <a href="tel:{{ phone | replace('-', '') }}">{{ phone }}</a>
+      {% for label, url in links.items() %}
+      {% if url %}<a href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>{% endif %}
+      {% endfor %}
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; {{ year }} {{ name }}</span>
+      <span>built with python + jinja2</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

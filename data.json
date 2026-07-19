@@ -1,0 +1,208 @@
+{
+  "name": "Sarifah Muliani",
+  "role": "AI & Data Analyst",
+  "confidence": "0.97",
+  "location": "Pekanbaru, Indonesia",
+  "phone": "0822-6890-3541",
+  "email": "sarifamulyani2@gmail.com",
+  "links": {
+    "LinkedIn": "https://www.linkedin.com/in/sarifahmuliani/",
+    "GitHub": "https://github.com/SarifahMuliani",
+    "Kaggle": "https://www.kaggle.com/sarifahmuliani"
+  },
+  "tagline": "Informatics Engineering graduate from UIN SUSKA Riau, now working as an AI & Data Analyst — building chatbots, annotating datasets, and training computer vision models for real-world problems in agriculture and healthcare.",
+  "about": "I work at the seam between machine learning and messy, real-world data: annotating agricultural images, structuring WhatsApp logistics logs, and shipping conversational AI that people in the field actually use. My thesis applied explainable AI to medical imaging, and my day job applies the same rigor to plantation health — label by label, dataset by dataset.",
+  "metrics": [
+    {
+      "label": "faithfulness",
+      "value": "0.94"
+    },
+    {
+      "label": "recall",
+      "value": "0.88"
+    },
+    {
+      "label": "thesis_accuracy",
+      "value": "96%"
+    },
+    {
+      "label": "images_annotated",
+      "value": "1,000+"
+    }
+  ],
+  "experience": [
+    {
+      "role": "AI & Data Analyst Intern",
+      "org": "PT. Digital Sawit Pro",
+      "period": "Jan 2026 – present",
+      "tags": [
+        "Dify",
+        "Docker",
+        "LabelMe",
+        "Android Studio"
+      ],
+      "bullets": [
+        "Deployed the ‘Sawit Doctor’ chatbot across Telegram, WhatsApp & Lark — Faithfulness 0.94, Recall 0.88.",
+        "Designed chatbot structure and workflows using Dify/Docker for end-to-end deployment.",
+        "Annotated 1,000+ agricultural image datasets in LabelMe to support computer vision model development.",
+        "Turned 500+ daily WhatsApp logistics records into structured datasets for monitoring and reporting.",
+        "Improved an image-labeler web tool's annotation features and overall usability.",
+        "Designed UI/UX mockups in Stitch to integrate Sawit Doctor across internal apps.",
+        "Built a working Android chatbot prototype in Android Studio to validate the mobile experience."
+      ]
+    },
+    {
+      "role": "Sales Trainee",
+      "org": "Ruangguru",
+      "period": "Dec 2025 – Jan 2026",
+      "tags": [
+        "Outreach",
+        "CRM",
+        "Scheduling"
+      ],
+      "bullets": [
+        "Promoted SkillAcademy & Ruangguru products via direct and digital outreach, converting 2 clients in one month.",
+        "Managed tutoring schedules and coordinated learning sessions for prospective students.",
+        "Organized outreach events across 5 schools within one month to expand student acquisition.",
+        "Contacted 100+ users in a single day as part of high-volume digital outreach campaigns."
+      ]
+    },
+    {
+      "role": "Data Entry",
+      "org": "Perum Bulog",
+      "period": "Oct 2025 – Dec 2025",
+      "tags": [
+        "Data Validation",
+        "Records"
+      ],
+      "bullets": [
+        "Digitized and validated ~700 rice-aid recipient records per day across Kampar Regency with high accuracy.",
+        "Filtered and processed 500+ data entries daily to keep records clean and accurate.",
+        "Input citizen identity data into the official system at a rate of 500 entries per day.",
+        "Cross-checked user data across multiple sources to maintain consistency."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Dokter Sawit — Chatbot Android App",
+      "period": "2026 · Personal Project",
+      "tags": [
+        "Kotlin",
+        "Android Studio",
+        "Chatbot API"
+      ],
+      "image": "images/proj-dokter-sawit.png",
+      "description": "Built a native Android chat app for the Dokter Sawit assistant — message bubbles, session handling, and API integration in Kotlin, wrapping the same chatbot logic behind the Sawit Doctor service."
+    },
+    {
+      "title": "KebunPRO — Plantation Health Dashboard",
+      "period": "2026 · Product Design",
+      "tags": [
+        "Figma",
+        "UI/UX Design",
+        "Product Design"
+      ],
+      "image": "images/proj-kebunpro.png",
+      "description": "Designed the mobile app flow for plantation monitoring: camera-based disease capture, AI diagnosis results (e.g. Ganoderma detection with confidence score), treatment plans, and detection history."
+    },
+    {
+      "title": "Aisyah — Food Ordering App",
+      "period": "2026 · UI/UX Design",
+      "tags": [
+        "Figma",
+        "UI/UX Design"
+      ],
+      "image": "images/proj-aisyah.png",
+      "description": "Designed the end-to-end ordering flow for a food delivery app — onboarding, authentication, menu browsing, discounts, checkout, and order-status tracking."
+    },
+    {
+      "title": "Lung Disease Detection with XAI",
+      "period": "2025 · Undergraduate Thesis",
+      "tags": [
+        "TensorFlow",
+        "Keras",
+        "SHAP",
+        "VGG-16"
+      ],
+      "description": "Trained a VGG-16 CNN on 3,030 chest X-ray images (COVID-19 / Pneumonia / Normal), reaching 96% accuracy, then applied SHAP explainability to visualize which regions of each image drove the model's predictions."
+    },
+    {
+      "title": "Company Profile Website",
+      "period": "2024 · PT. MSI",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "description": "Built a responsive company-profile site matched to brand and business requirements, alongside B2B prospecting that identified 200+ potential partner companies in a single day."
+    },
+    {
+      "title": "Futsal Field Booking App",
+      "period": "2023 · UI/UX",
+      "tags": [
+        "Figma",
+        "UI/UX Design"
+      ],
+      "description": "Designed a responsive futsal-field booking app in Figma, running user research and iterative reviews so the interface matched real booking behavior."
+    }
+  ],
+  "education": {
+    "degree": "Bachelor of Informatics Engineering",
+    "school": "UIN SUSKA RIAU",
+    "period": "Jul 2021 – Oct 2025",
+    "detail": "Faculty of Science and Technology · GPA 3.32 / 4.00",
+    "thesis": "Thesis: Application of SHAP in Deep Learning for Lung Disease Detection using X-Ray Images."
+  },
+  "certifications": [
+    "Java — Sololearn (2021)",
+    "Data Analytics — Deloitte Virtual Internship",
+    "Data Labeling — Forage (Intent, Sentiment, PII)",
+    "Understanding Data — Myskill"
+  ],
+  "skills": {
+    "Technical": [
+      "Python (Pandas, NumPy)",
+      "HTML/CSS/JS",
+      "TensorFlow / Keras",
+      "Deep Learning",
+      "SQL",
+      "Redis"
+    ],
+    "AI & Chatbot": [
+      "Conversational AI Design",
+      "Chatbot Training",
+      "Knowledge Base Structuring",
+      "Q&A Pair Generation",
+      "NoCode (Dify)",
+      "ANN",
+      "LangChain"
+    ],
+    "Tools": [
+      "VS Code",
+      "Google Colab",
+      "Jupyter",
+      "Docker",
+      "Dify",
+      "LabelMe",
+      "Git/GitHub",
+      "Figma",
+      "Canva",
+      "Tableau",
+      "Vertex AI",
+      "Google Stitch"
+    ],
+    "Languages": [
+      "Indonesian (Native)",
+      "English (Basic)"
+    ],
+    "Soft Skills": [
+      "Teamwork",
+      "Communication",
+      "Attention to Detail",
+      "Customer Engagement",
+      "Fast Learner",
+      "Problem Solving"
+    ]
+  }
+}
